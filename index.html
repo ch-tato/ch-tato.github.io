@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" href="RBsquare.png" type="image/png">
+    <link rel="icon" href="/RBsquare.png" type="image/png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -176,7 +176,7 @@
         .timeline-item.animate-on-scroll {
             opacity: 0;
             transform: translateY(40px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Slower transition */
+            transition: opacity 1.1s ease-out, transform 1.1s ease-out; /* Slower transition */
         }
         .timeline-item.is-visible {
             opacity: 1;
@@ -290,6 +290,7 @@
             </button>
             <!-- Desktop Navigation -->
             <div id="desktop-menu" class="hidden md:flex space-x-8 text-lg items-center">
+                <a href="#/quiz1" class="nav-link">Home</a>
                 <a href="#/quiz1/profile" class="nav-link">About</a>
                 <a href="#/quiz1/hometown" class="nav-link">History</a>
                 <a href="#/quiz1/food" class="nav-link">Foods</a>
@@ -298,6 +299,7 @@
         </nav>
         <!-- Mobile Navigation -->
         <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#/quiz1" class="block py-2 nav-link">Home</a>
             <a href="#/quiz1/profile" class="block py-2 nav-link">About</a>
             <a href="#/quiz1/hometown" class="block py-2 nav-link">History</a>
             <a href="#/quiz1/food" class="block py-2 nav-link">Foods</a>
@@ -359,7 +361,7 @@
         <section id="/quiz1/profile" class="page">
              <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-lg shadow-md">
                 <div class="flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
-                    <img src="me 1 to 1.jpeg" alt="Profile Picture" class="w-56 h-56 rounded-full object-cover border-4 border-white shadow-lg flex-shrink-0">
+                    <img src="/me 1 to 1.jpeg" alt="Profile Picture" class="w-56 h-56 rounded-full object-cover border-4 border-white shadow-lg flex-shrink-0">
                     <div class="mt-6 md:mt-0 md:ml-8">
                         <h1 class="text-4xl font-bold brand-red">Muhammad Quthbi Danish Abqori</h1>
                         <p class="text-xl text-gray-500 mt-1">5025241036 - Web Programming (C)</p>
@@ -603,3 +605,4 @@
     </script>
 </body>
 </html>
+
