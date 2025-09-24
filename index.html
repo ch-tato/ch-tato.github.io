@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedBridge - Discover Madura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB; /* Light gray background for a soft feel */
+        }
+        /* Custom red color inspired by the Suramadu Bridge */
+        .brand-red { color: #D92525; }
+        .bg-brand-red { background-color: #D92525; }
+        .border-brand-red { border-color: #D92525; }
+
+        /* Hide all pages by default */
+        .page {
+            display: none;
+        }
+        /* Show the active page */
+        .page.active {
+            display: block;
+        }
+
+        /* Nav link styling */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+            color: #4B5563; /* Gray text for nav links */
+        }
+        .nav-link:hover {
+            color: #D92525; /* Red on hover */
+        }
+        .nav-link.active-link {
+            color: #D92525;
+            font-weight: 600;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #D92525;
+            transition: width 0.3s ease;
+        }
+        .nav-link.active-link::after,
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Card hover effect */
+        .nav-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .nav-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        /* Vertical Timeline styles */
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: #D92525;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            z-index: 1;
+        }
+        .timeline-item {
+            padding: 40px 40px;
+            position: relative;
+            width: 50%;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: #D92525; /* Changed from white to solid brand red */
+            border: 4px solid #D92525;
+            top: 55px;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        /* New styles for the year headline */
+        .timeline-year {
+            position: absolute;
+            top: 40px;
+            font-size: 3.75rem; /* text-6xl, EVEN BIGGER */
+            line-height: 1;
+            font-weight: 800; /* extrabold */
+            color: #D92525;
+            width: 180px; /* Increased width to accommodate larger font */
+            z-index: 3;
+        }
+        .timeline-left .timeline-year {
+            right: -190px; /* Adjusted positioning */
+            text-align: right;
+        }
+        .timeline-right .timeline-year {
+            left: -190px; /* Adjusted positioning */
+            text-align: left;
+        }
+
+        .timeline-left {
+            left: 0;
+        }
+        .timeline-right {
+            left: 50%;
+        }
+        .timeline-right::after {
+            left: -10px;
+        }
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Responsive timeline */
+        @media screen and (max-width: 768px) {
+            .timeline-container::after {
+                left: 31px;
+            }
+            .timeline-item {
+                width: 100%;
+                padding: 20px 25px 20px 70px;
+            }
+            .timeline-item::before {
+                display: none; /* Hide arrows on mobile */
+            }
+
+            /* Stack year on top of content for mobile */
+            .timeline-year {
+                position: relative;
+                top: auto;
+                left: auto !important;
+                right: auto !important;
+                width: auto;
+                text-align: left !important;
+                margin-bottom: 0.75rem;
+                font-size: 2.25rem; /* text-4xl on mobile */
+            }
+
+            .timeline-left::after, .timeline-right::after {
+                left: 21px;
+                top: 45px;
+            }
+            .timeline-right {
+                left: 0%;
+            }
+        }
+
+        /* Scroll-triggered animation styles */
+        .timeline-item.animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Slower transition */
+        }
+        .timeline-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card Expander Styles */
+        .card-expander-container {
+            display: flex;
+            width: 100%;
+            gap: 0.75rem; /* 12px */
+            height: 400px; /* Fixed height for the container */
+            margin-top: 4rem; /* 64px */
+        }
+        .expander-card {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: flex 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+        }
+        .expander-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+            transition: transform 0.5s ease;
+        }
+        .expander-card:hover img {
+            transform: scale(1.05);
+        }
+        .expander-card .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 50%);
+        }
+        .expander-card h2 {
+            position: absolute;
+            bottom: 1.5rem; /* p-6 */
+            left: 1.5rem; /* p-6 */
+            color: white;
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800;
+            opacity: 0; /* Make title invisible by default */
+            /* Adjusted transition for opacity and transform */
+            transition: opacity 0.5s 0.2s ease, transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+        }
+        .expander-card h2 a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .card-content {
+            position: absolute;
+            bottom: 1.5rem; /* p-6 */
+            left: 1.5rem; /* p-6 */
+            right: 1.5rem; /* p-6 */
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s 0.1s ease, transform 0.5s 0.1s ease;
+        }
+        .card-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+        }
+        .card-content a {
+            display: inline-block;
+            margin-top: 1rem;
+            background-color: #D92525;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .card-content a:hover {
+            background-color: #b91c1c; /* A darker red */
+        }
+
+        /* Expanded State */
+        .expander-card.expanded {
+            flex: 5;
+        }
+        .expander-card.expanded h2 {
+            opacity: 1; /* Make title visible when expanded */
+            transform: translateY(-120px); /* Move title up to make space for content */
+        }
+        .expander-card.expanded .card-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#/quiz1" class="text-2xl font-bold tracking-wider">
+                <span class="brand-red">Red</span>Bridge
+            </a>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+            <!-- Desktop Navigation -->
+            <div id="desktop-menu" class="hidden md:flex space-x-8 text-lg items-center">
+                <a href="#/quiz1/profile" class="nav-link">About</a>
+                <a href="#/quiz1/hometown" class="nav-link">History</a>
+                <a href="#/quiz1/food" class="nav-link">Foods</a>
+                <a href="#/quiz1/tourist" class="nav-link">Places</a>
+            </div>
+        </nav>
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#/quiz1/profile" class="block py-2 nav-link">About</a>
+            <a href="#/quiz1/hometown" class="block py-2 nav-link">History</a>
+            <a href="#/quiz1/food" class="block py-2 nav-link">Foods</a>
+            <a href="#/quiz1/tourist" class="block py-2 nav-link">Places</a>
+        </div>
+    </header>
+
+    <main id="app-container" class="container mx-auto px-6 py-12 md:py-16">
+
+        <!-- Page 1: Homepage -->
+        <section id="/quiz1" class="page">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
+                    Welcome to <span class="brand-red">Red</span>Bridge
+                </h1>
+                <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-600">
+                    Your minimalist guide to the enchanting island of Madura. We are named after the iconic red Suramadu Bridge, the gateway to an island of rich culture, stunning landscapes, and unforgettable flavors.
+                </p>
+            </div>
+            
+            <!-- NEW Card Expander Section -->
+            <div class="card-expander-container">
+                <!-- Hometown Card -->
+                <div class="expander-card expanded"> <!-- Starts expanded -->
+                    <img src="https://images.unsplash.com/photo-1542218773294-ff28be7e6451?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA==" alt="Madura Historical Site">
+                    <div class="card-overlay"></div>
+                    <h2><a href="#/quiz1/hometown">Hometown</a></h2>
+                    <div class="card-content">
+                        <p>Journey through the rich history and cultural heritage of Madura, from ancient kingdoms to modern marvels.</p>
+                        <a href="#/quiz1/hometown">Explore History</a>
+                    </div>
+                </div>
+                
+                <!-- Local Food Card -->
+                <div class="expander-card">
+                    <img src="https://images.pexels.com/photos/27099588/pexels-photo-27099588.jpeg" alt="Madura's Local Food">
+                    <div class="card-overlay"></div>
+                    <h2><a href="#/quiz1/food">Local Food</a></h2>
+                    <div class="card-content">
+                        <p>Savor the unique and bold flavors of Madurese cuisine, a culinary adventure for your taste buds.</p>
+                        <a href="#/quiz1/food">Taste Madura</a>
+                    </div>
+                </div>
+                
+                <!-- Tourist Places Card -->
+                <div class="expander-card">
+                    <img src="https://asset.kompas.com/crops/cxEMuvs8lXBF28A0YhuZuV4UFLo=/0x0:1000x667/1200x800/data/photo/2023/08/26/64ea27d97d217.jpg" alt="Madura Tourist Destination">
+                    <div class="card-overlay"></div>
+                    <h2><a href="#/quiz1/tourist">Tourist Places</a></h2>
+                    <div class="card-content">
+                        <p>Discover breathtaking beaches, unique geological formations, and serene spots across the island.</p>
+                        <a href="#/quiz1/tourist">See the Sights</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 2: Profile -->
+        <section id="/quiz1/profile" class="page">
+             <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-lg shadow-md">
+                <div class="flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
+                    <img src="https://placehold.co/250x250/F3F4F6/4B5563?text=Profile" alt="Profile Picture" class="w-56 h-56 rounded-full object-cover border-4 border-white shadow-lg flex-shrink-0">
+                    <div class="mt-6 md:mt-0 md:ml-8">
+                        <h1 class="text-4xl font-bold brand-red">Muhammad Quthbi Danish Abqori</h1>
+                        <p class="text-xl text-gray-500 mt-1">5025241036 - Web Programming (C)</p>
+                        <p class="mt-6 text-lg text-gray-700 leading-relaxed">
+                            Hello! I'm the creator of RedBridge. My passion for minimalist design and a deep appreciation for Indonesian culture inspired me to build this website. While not a Madura native, my travels across the island revealed a hidden gem I believe more people should discover. RedBridge is my small contribution to showcasing the beauty, history, and flavor of this incredible island. I hope you enjoy your virtual journey!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 3: Hometown (History) -->
+        <section id="/quiz1/hometown" class="page">
+            <div class="text-center mb-16">
+                 <h1 class="text-4xl md:text-5xl font-extrabold">History of <span class="brand-red">Madura</span></h1>
+                 <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">A vertical journey through the key moments that shaped the island of Madura.</p>
+            </div>
+            <div class="timeline-container">
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item timeline-left animate-on-scroll">
+                    <span class="timeline-year">900</span>
+                    <div class="timeline-content">
+                        <h2 class="text-2xl font-bold brand-red">Ancient Origins</h2>
+                        <p class="mt-2 text-gray-700">Early history of Madura is intertwined with the major Javanese kingdoms like Singhasari and Majapahit. It was known as a source of salt and skilled sailors, often playing a strategic role in regional maritime power struggles.</p>
+                    </div>
+                </div>
+                 <!-- Timeline Item 2 -->
+                <div class="timeline-item timeline-right animate-on-scroll">
+                    <span class="timeline-year">1650</span>
+                    <div class="timeline-content">
+                        <h2 class="text-2xl font-bold brand-red">The Rise of Cakraningrat</h2>
+                        <p class="mt-2 text-gray-700">The Cakraningrat dynasty rises as a powerful local force in West Madura. They become key allies of the Mataram Sultanate and, later, the Dutch East India Company (VOC), significantly influencing the politics of Java and Madura.</p>
+                    </div>
+                </div>
+                <!-- Timeline Item 3 -->
+                <div class="timeline-item timeline-left animate-on-scroll">
+                    <span class="timeline-year">1750</span>
+                    <div class="timeline-content">
+                        <h2 class="text-2xl font-bold brand-red">Dutch Colonial Era</h2>
+                        <p class="mt-2 text-gray-700">By the mid-18th century, Madura falls completely under Dutch colonial control. The island is administratively divided, and its economy is focused on salt production for the colonial government. This period also sees the rise of distinct cultural practices.</p>
+                    </div>
+                </div>
+                <!-- Timeline Item 4 -->
+                <div class="timeline-item timeline-right animate-on-scroll">
+                    <span class="timeline-year">1945</span>
+                    <div class="timeline-content">
+                        <h2 class="text-2xl font-bold brand-red">Indonesian Independence</h2>
+                        <p class="mt-2 text-gray-700">Following Indonesia's declaration of independence, Madura is integrated into the Republic of Indonesia. It becomes part of the East Java province, maintaining its unique cultural identity, language, and traditions within the larger nation.</p>
+                    </div>
+                </div>
+                <!-- Timeline Item 5 -->
+                <div class="timeline-item timeline-left animate-on-scroll">
+                    <span class="timeline-year">2009</span>
+                    <div class="timeline-content">
+                        <h2 class="text-2xl font-bold brand-red">The Suramadu Bridge</h2>
+                        <p class="mt-2 text-gray-700">The opening of the Suramadu Bridge, the longest in Indonesia, marks a new era for Madura. It dramatically improves connectivity with Java, boosting economic development, tourism, and accessibility to the island.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 4: Local Food -->
+        <section id="/quiz1/food" class="page">
+            <div class="text-center mb-16">
+                 <h1 class="text-4xl md:text-5xl font-extrabold">Iconic Madurese <span class="brand-red">Cuisine</span></h1>
+                 <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">A taste of the three most popular and beloved dishes from the island.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+                <!-- Food Item 1 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.pexels.com/photos/23147806/pexels-photo-23147806.jpeg" alt="Sate Madura" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold">Sate Madura</h2>
+                        <p class="mt-2 text-gray-600">Arguably the most famous dish, this chicken or mutton satay is characterized by its small pieces of meat and a distinctive peanut sauce mixed with sweet soy sauce, garlic, and shallots, grilled over hot charcoal.</p>
+                    </div>
+                </div>
+                <!-- Food Item 2 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                    <img src="https://d1vbn70lmn1nqe.cloudfront.net/prod/wp-content/uploads/2023/08/08034559/Resep-Bebek-Sinjay-Khas-Madura-Lengkap-dengan-Sambal-Pencit.jpg.webp" alt="Bebek Sinjay" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold">Bebek Sinjay</h2>
+                        <p class="mt-2 text-gray-600">A legendary fried duck dish known for its crispy skin and tender, savory meat. It's typically served with steamed rice, fresh vegetables, and a unique, spicy mango sambal that perfectly complements the rich flavor of the duck.</p>
+                    </div>
+                </div>
+                <!-- Food Item 3 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                    <img src="https://images.tokopedia.net/img/JFrBQq/2023/6/23/98b75ed1-f289-4b51-969f-619c4f100010.jpg" alt="Soto Madura" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold">Soto Madura</h2>
+                        <p class="mt-2 text-gray-600">A clear, aromatic beef soup with a yellowish broth from turmeric. This hearty soto is filled with beef or offal, glass noodles, and boiled potato slices, often topped with fried shallots and served with a side of sambal.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 5: Tourist Places -->
+        <section id="/quiz1/tourist" class="page">
+            <div class="text-center mb-16">
+                 <h1 class="text-4xl md:text-5xl font-extrabold">Popular Tourist <span class="brand-red">Destinations</span></h1>
+                 <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">Explore three of the most captivating and visited spots in Madura.</p>
+            </div>
+            <!-- The layout mirrors the food page for consistency -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+                <!-- Tourist Spot 1 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                    <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/07/30/65/img-20170102-005423-658.jpg?w=800&h=400&s=1" alt="Bukit Jaddih" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold">Bukit Jaddih</h2>
+                        <p class="mt-2 text-gray-600">A former limestone quarry transformed into a stunning landscape of white chalk hills and turquoise water pools. Its unique, almost otherworldly appearance makes it a popular spot for photography and exploration.</p>
+                    </div>
+                </div>
+                <!-- Tourist Spot 2 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                    <img src="https://panduanwisata.id/wp-content/uploads/2022/10/Pulau-Gili-Labak-Sumenep-Madura.jpeg" alt="Gili Labak" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold">Gili Labak</h2>
+                        <p class="mt-2 text-gray-600">A tiny, pristine island off the southeast coast of Madura, famous for its white sandy beaches and crystal-clear waters. It's a paradise for snorkeling, diving, and those seeking a tranquil beach escape.</p>
+                    </div>
+                </div>
+                <!-- Tourist Spot 3 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md">
+                    <img src="https://superlive.id/storage/superadventure/2019/05/14/a4fe6c3e3eba.jpg" alt="Air Terjun Toroan" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold">Air Terjun Toroan</h2>
+                        <p class="mt-2 text-gray-600">A unique waterfall located on the coast that flows directly into the sea. The combination of the freshwater falls and the saltwater of the Madura Strait creates a spectacular and rare natural phenomenon.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-16">
+        <div class="container mx-auto px-6 py-6 text-center text-gray-500">
+            <p>&copy; 2025 RedBridge. A tribute to the beauty of Madura Island.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pages = document.querySelectorAll('.page');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // --- Mobile Menu Toggle ---
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            function handleRouteChange() {
+                // Close mobile menu on navigation
+                mobileMenu.classList.add('hidden');
+                
+                const hash = window.location.hash.substring(1) || '/quiz1';
+                
+                // Hide all pages
+                pages.forEach(page => page.classList.remove('active'));
+                
+                // Show the active page
+                const activePage = document.getElementById(hash);
+                if (activePage) {
+                    activePage.classList.add('active');
+                } else {
+                    // Fallback to homepage if hash is invalid
+                    document.getElementById('/quiz1').classList.add('active');
+                }
+                
+                // Update active link styling
+                navLinks.forEach(link => {
+                    // Get the href attribute and remove the leading '#'
+                    const linkHash = link.getAttribute('href').substring(1);
+                    if (linkHash === hash) {
+                        link.classList.add('active-link');
+                    } else {
+                        link.classList.remove('active-link');
+                    }
+                });
+
+                // Scroll to top on page change
+                window.scrollTo(0, 0);
+            }
+
+            // Listen for hash changes
+            window.addEventListener('hashchange', handleRouteChange);
+
+            // Initial route handling
+            // Set default hash if none is present
+            if (!window.location.hash) {
+                window.location.hash = '#/quiz1';
+            }
+            handleRouteChange();
+            
+            // Close mobile menu when clicking a link
+             mobileMenu.addEventListener('click', (e) => {
+                if (e.target.tagName === 'A') {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+            
+            // --- Scroll Animation Observer ---
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Optional: stop observing once it's visible
+                    }
+                });
+            }, {
+                threshold: 0.3 // Trigger when 30% of the element is visible (was 0.1)
+            });
+
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+            
+            // --- Card Expander Logic ---
+            const expanderCards = document.querySelectorAll('.expander-card');
+            
+            expanderCards.forEach(card => {
+                card.addEventListener('mouseover', () => { // Changed from 'click' to 'mouseover'
+                    // First, remove 'expanded' from all cards
+                    expanderCards.forEach(c => c.classList.remove('expanded'));
+                    // Then, add 'expanded' to the hovered card
+                    card.classList.add('expanded');
+                });
+
+                // Add click event to the entire card for navigation
+                card.addEventListener('click', () => {
+                    const link = card.querySelector('.card-content a');
+                    if (link) {
+                        // Navigate to the link's href
+                        window.location.hash = link.getAttribute('href');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
